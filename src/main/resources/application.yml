@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/thesisrepo
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.time_zone: UTC
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+file:
+  storage-root: ${user.home}/Documents/ThesisRepo/uploads
+
+server:
+  port: 8080

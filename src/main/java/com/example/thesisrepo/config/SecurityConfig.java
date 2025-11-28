@@ -1,0 +1,85 @@
+package com.example.thesisrepo.config;
+
+import com.example.thesisrepo.service.UserDetailsServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+
+  private final UserDetailsServiceImpl userDetailsService;
+
+  public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+    this.userDetailsService = userDetailsService;
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder());
+    return provider;
+  }
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+      // we disable CSRF here because the frontend talks to the API with fetch()
+      .csrf(csrf -> csrf.disable())
+      .authenticationProvider(authenticationProvider())
+      .authorizeHttpRequests(auth -> auth
+        // public pages (no login needed)
+        .requestMatchers(
+          "/",                // maps to static index.html
+          "/index.html",
+          "/favicon.ico",
+          "/assets/**",       // Vite / static assets
+          "/css/**",
+          "/js/**",
+          "/images/**",
+          "/webjars/**",
+          "/error"
+        ).permitAll()
+
+        // public registration endpoints
+        .requestMatchers(
+          "/api/auth/register-student",
+          "/api/auth/register-lecturer",
+          "/api/auth/register-admin"
+        ).permitAll()
+
+        // public search endpoints (digital repository)
+        .requestMatchers("/api/public/**").permitAll()
+
+        // role-protected API areas
+        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+        .requestMatchers("/api/lecturers/**").hasRole("LECTURER")
+        .requestMatchers("/api/theses/**").hasRole("STUDENT")
+
+        // everything else must be authenticated
+        .anyRequest().authenticated()
+      )
+      // allow both HTTP Basic (for tools) and form login (for browser)
+      .httpBasic(Customizer.withDefaults())
+      .formLogin(form -> form
+        .loginPage("/login")  // use the default /login page
+        .permitAll()
+      )
+      .logout(logout -> logout.permitAll());
+
+    return http.build();
+  }
+}

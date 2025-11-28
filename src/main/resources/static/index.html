@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SU ETD Repository</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --blue-dark: #0b3c68;
+      --blue: #1f6fb2;
+      --blue-light: #e6f1fb;
+      --bg: #f5f7fb;
+      --text-main: #1b1b1b;
+      --text-muted: #6b7280;
+      --border: #d1d5db;
+      --danger: #b91c1c;
+      --success: #15803d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, var(--blue-dark), #123a6c);
+      color: white;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-header {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-sub {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-bottom: 18px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      gap: 9px;
+      font-size: 14px;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .nav-item span {
+      flex: 1;
+      text-align: left;
+    }
+
+    .sidebar-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: brightness(1.1);
+    }
+
+    .sidebar-footer {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    /* Main content */
+
+    .content {
+      flex: 1;
+      padding: 22px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--blue-dark);
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 18px 18px 20px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--blue-dark);
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Forms */
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 4px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #111827;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #f9fafb;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+      background: #ffffff;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1b63a1;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--blue-dark);
+      border: 1px solid var(--blue);
+    }
+
+    .btn-outline:hover {
+      background: var(--blue-light);
+    }
+
+    .link {
+      font-size: 12px;
+      color: var(--blue);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .hint-error {
+      color: var(--danger);
+    }
+
+    .hint-success {
+      color: var(--success);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .form-row .field-group {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+    }
+
+    /* Browse */
+
+    .authors-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .authors-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .authors-row input {
+      flex: 1;
+    }
+
+    .browse-results {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f9fafb;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Small header status */
+
+    .account-status {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .logout-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-header">SU ETD Repository</div>
+      <div class="sidebar-sub">Electronic Theses & Dissertations</div>
+    </div>
+
+    <ul class="nav-list">
+      <li>
+        <button class="nav-item active" data-section="dashboard-section">
+          <img src="dashboard.png" class="sidebar-icon" alt="Dashboard icon" />
+          <span>Dashboard</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-section="account-section">
+          <img src="account.png" class="sidebar-icon" alt="Account icon" />
+          <span>Account</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-section="home-section">
+          <img src="home.png" class="sidebar-icon" alt="Home icon" />
+          <span>Home</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item nav-people hidden" data-section="people-section">
+          <img src="people.png" class="sidebar-icon" alt="People icon" />
+          <span>People</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-section="browse-section">
+          <img src="browse.png" class="sidebar-icon" alt="Browse icon" />
+          <span>Browse</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-section="help-section">
+          <img src="help.png" class="sidebar-icon" alt="Help icon" />
+          <span>Help</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div>© Sampoerna University</div>
+      <div>ETD Prototype</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-subtitle" id="page-subtitle">
+          Overview of the SU Electronic Thesis & Dissertation submission portal.
+        </div>
+      </div>
+      <div class="account-status" id="account-status">
+        Not signed in
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard-section" class="page-section active">
+      <div class="card">
+        <div class="card-title">Welcome to SU ETD Repository</div>
+        <div class="card-subtitle">
+          Students can register, log in, and eventually submit their thesis PDFs for library review and publication.
+        </div>
+        <p class="hint">
+          This is a prototype connected to the <strong>Spring Boot backend</strong>. Right now:
+          <br>• Register → <code>POST /api/auth/register-student</code>
+          <br>• Login (student) → HTTP Basic, checking <code>GET /api/theses/mine</code>
+          <br>• Browse → UI only (search API to be added later)
+        </p>
+      </div>
+    </section>
+
+    <!-- ACCOUNT SECTION -->
+    <section id="account-section" class="page-section">
+      <!-- LOGIN VIEW -->
+      <div id="login-view" class="card">
+        <div class="card-title">Student Login</div>
+        <div class="card-subtitle">
+          Sign in with your SU email and password. For now, this login is for <strong>student accounts</strong>.
+        </div>
+
+        <form id="login-form">
+          <div class="field-group">
+            <label for="login-email">SU Email</label>
+            <input type="email" id="login-email" required placeholder="student@my.sampoernauniversity.ac.id" />
+          </div>
+          <div class="field-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <p class="hint" style="margin-top: 8px;">
+          Don't have an account?
+          <span class="link" id="show-register-link">Register here</span>
+        </p>
+
+        <p class="hint" id="login-message" style="margin-top: 6px;"></p>
+      </div>
+
+      <!-- REGISTER VIEW -->
+      <div id="register-view" class="card hidden">
+        <div class="card-title">Student Registration</div>
+        <div class="card-subtitle">
+          Create a new student account for thesis submission. Faculty and major are used to label your program.
+        </div>
+
+        <form id="register-form">
+          <div class="field-group">
+            <label for="reg-email">SU Email</label>
+            <input type="email" id="reg-email" required placeholder="student@my.sampoernauniversity.ac.id" />
+          </div>
+
+          <div class="field-group">
+            <label for="reg-student-number">Student ID Number</label>
+            <input type="text" id="reg-student-number" required placeholder="e.g. 2306275071" />
+          </div>
+
+          <div class="form-row">
+            <div class="field-group">
+              <label for="reg-faculty">Faculty</label>
+              <select id="reg-faculty" required>
+                <option value="">-- Select Faculty --</option>
+                <option value="FOB">Faculty of Business (FOB)</option>
+                <option value="FET">Faculty of Engineering and Technology (FET)</option>
+                <option value="FOE">Faculty of Education (FOE)</option>
+                <option value="FAS">Faculty of Arts and Science (FAS)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="reg-major">Major</label>
+              <select id="reg-major" required>
+                <option value="">-- Select Major --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" required />
+            <div class="hint" id="password-hint">
+              Password must be at least 14 characters and include:
+              uppercase, lowercase, number, and special character.
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="reg-password-confirm">Re-enter Password</label>
+            <input type="password" id="reg-password-confirm" required />
+            <div class="hint" id="password-match-hint"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+
+        <p class="hint" style="margin-top: 8px;">
+          Already have an account?
+          <span class="link" id="show-login-link">Login here</span>
+        </p>
+
+        <p class="hint" id="register-message" style="margin-top: 6px;"></p>
+      </div>
+    </section>
+
+    <!-- HOME SECTION -->
+    <section id="home-section" class="page-section">
+      <div class="card">
+        <div class="card-title">Home</div>
+        <div class="card-subtitle">
+          General information about the SU digital thesis repository.
+        </div>
+        <p class="hint">
+          Later you can put announcements, submission deadlines, and formatting guidelines here.
+        </p>
+      </div>
+    </section>
+
+    <!-- PEOPLE SECTION (only visible when logged in) -->
+    <section id="people-section" class="page-section">
+      <div class="card">
+        <div class="card-title">Supervisors</div>
+        <div class="card-subtitle">
+          Manage your thesis supervisors. This section is only visible when you are signed in.
+        </div>
+
+        <!-- Current supervisors list -->
+        <h3 class="section-heading" style="margin-top: 12px;">Current Supervisors</h3>
+        <ul id="supervisors-list" class="bullet-list">
+          <!-- Filled by JavaScript -->
+        </ul>
+
+        <hr class="divider" />
+
+        <!-- Add supervisor form -->
+        <h3 class="section-heading" style="margin-top: 12px;">Add Supervisor</h3>
+        <p class="hint">
+          Select a lecturer from the list and click <strong>Add supervisor</strong>. If they are already
+          your supervisor, the system will not create duplicates.
+        </p>
+
+        <form id="add-supervisor-form" class="form-row" style="align-items: flex-end;">
+          <div class="field-group">
+            <label for="supervisor-select">Lecturer</label>
+            <select id="supervisor-select">
+              <option value="">-- Choose lecturer --</option>
+              <!-- Options filled by JavaScript -->
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">
+            Add supervisor
+          </button>
+        </form>
+
+        <p id="supervisor-message" class="hint"></p>
+      </div>
+    </section>
+
+
+    <!-- BROWSE SECTION -->
+    <section id="browse-section" class="page-section">
+      <div class="card">
+        <div class="card-title">Browse Theses</div>
+        <div class="card-subtitle">
+          Filter theses by keyword, year, faculty, major, and author(s).
+          This is UI-only for now; backend search endpoint can be added later.
+        </div>
+
+        <form id="browse-form">
+          <div class="field-group">
+            <label for="browse-keyword">Keyword</label>
+            <input type="text" id="browse-keyword" placeholder="e.g. machine learning, mobile banking" />
+          </div>
+
+          <div class="form-row">
+            <div class="field-group">
+              <label for="browse-year">Year Published</label>
+              <select id="browse-year">
+                <option value="">Any year</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="browse-faculty">Faculty</label>
+              <select id="browse-faculty">
+                <option value="">All faculties</option>
+                <option value="FOB">Faculty of Business (FOB)</option>
+                <option value="FET">Faculty of Engineering and Technology (FET)</option>
+                <option value="FOE">Faculty of Education (FOE)</option>
+                <option value="FAS">Faculty of Arts and Science (FAS)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="browse-major">Major</label>
+              <select id="browse-major">
+                <option value="">All majors</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Author(s)</label>
+            <div class="authors-wrapper" id="authors-wrapper">
+              <div class="authors-row">
+                <input type="text" class="author-input" placeholder="Author 1 name" />
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline" id="add-author-btn">+ Add another author</button>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 6px;">Search</button>
+        </form>
+
+        <div class="browse-results" id="browse-results">
+          Search results will appear here. Currently, this just echoes your filters
+          (backend search API is not wired yet).
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP SECTION -->
+    <section id="help-section" class="page-section">
+      <div class="card">
+        <div class="card-title">Help & Instructions</div>
+        <div class="card-subtitle">
+          Basic usage guide for this prototype interface.
+        </div>
+        <ul class="hint" style="padding-left: 18px; margin-top: 4px;">
+          <li>Use <strong>Account</strong> to register and log in as a student.</li>
+          <li>After login, the <strong>People</strong> sidebar item will appear.</li>
+          <li>Use <strong>Browse</strong> to experiment with search filters.</li>
+          <li>Later, this page can include FAQ, formatting instructions, and contact details.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // --- Simple front-end "state" ---
+  let currentUser = null; // { email, password, role }
+  try {
+    const saved = localStorage.getItem("currentUser");
+    if (saved) currentUser = JSON.parse(saved);
+  } catch (e) {
+    console.warn("Could not parse currentUser from localStorage", e);
+  }
+
+  // --- Faculty → majors map (used for register & browse) ---
+  const facultyMajors = {
+    FOB: ["Management", "Accounting"],
+    FET: [
+      "Computer Science",
+      "Information Systems",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+      "Visual Communication Design",
+    ],
+    FOE: ["English Education"],
+    FAS: ["Psychology"],
+  };
+
+    // --- Build Authorization headers for HTTP Basic using currentUser ---
+  function getAuthHeaders() {
+    if (!currentUser || !currentUser.email || !currentUser.password) {
+      return {};
+    }
+    return {
+      Authorization: "Basic " + btoa(currentUser.email + ":" + currentUser.password),
+    };
+  }
+
+  function populateMajorSelect(selectElement, facultyCode, allowAllOption) {
+    selectElement.innerHTML = "";
+    if (allowAllOption) {
+      const optAll = document.createElement("option");
+      optAll.value = "";
+      optAll.textContent = "All majors";
+      selectElement.appendChild(optAll);
+    } else {
+      const optPlaceholder = document.createElement("option");
+      optPlaceholder.value = "";
+      optPlaceholder.textContent = "-- Select Major --";
+      selectElement.appendChild(optPlaceholder);
+    }
+
+    if (!facultyCode || !facultyMajors[facultyCode]) return;
+    facultyMajors[facultyCode].forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      selectElement.appendChild(opt);
+    });
+  }
+
+  // --- UI helpers ---
+
+    function setActiveSection(sectionId) {
+    document.querySelectorAll(".page-section").forEach((sec) => {
+      sec.classList.toggle("active", sec.id === sectionId);
+    });
+    // Update header title/subtitle
+    const pageTitle = document.getElementById("page-title");
+    const pageSubtitle = document.getElementById("page-subtitle");
+    switch (sectionId) {
+      case "dashboard-section":
+        pageTitle.textContent = "Dashboard";
+        pageSubtitle.textContent =
+          "Overview of the SU Electronic Thesis & Dissertation submission portal.";
+        break;
+      case "account-section":
+        pageTitle.textContent = "Account";
+        pageSubtitle.textContent = "Register or log in to manage your thesis submissions.";
+        break;
+      case "home-section":
+        pageTitle.textContent = "Home";
+        pageSubtitle.textContent = "General information about the SU thesis repository.";
+        break;
+      case "people-section":
+        pageTitle.textContent = "People";
+        pageSubtitle.textContent =
+          "Manage your supervisors. This page appears when you are signed in.";
+
+        // When People is opened, load data and wire the form
+        setupPeopleSection();
+        loadLecturersForPeople();
+        loadSupervisorsForPeople();
+        break;
+      case "browse-section":
+        pageTitle.textContent = "Browse";
+        pageSubtitle.textContent =
+          "Experiment with filters to browse theses. Backend search will be added later.";
+        break;
+      case "help-section":
+        pageTitle.textContent = "Help";
+        pageSubtitle.textContent = "How to use this prototype interface.";
+        break;
+    }
+  }
+
+    // ------- PEOPLE SECTION: supervisors UI -------
+
+  async function loadLecturersForPeople() {
+    const select = document.getElementById("supervisor-select");
+    const messageEl = document.getElementById("supervisor-message");
+    if (!select) return;
+
+    // Reset options
+    select.innerHTML = '<option value="">-- Choose lecturer --</option>';
+
+    try {
+      const resp = await fetch("/api/lecturers/list", {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      if (!resp.ok) {
+        throw new Error("Failed to load lecturers (HTTP " + resp.status + ")");
+      }
+      const lecturers = await resp.json();
+      if (!Array.isArray(lecturers) || lecturers.length === 0) {
+        if (messageEl) {
+          messageEl.textContent = "No lecturers are configured yet.";
+          messageEl.classList.remove("hint-success");
+          messageEl.classList.add("hint-error");
+        }
+        return;
+      }
+
+      lecturers.forEach((l) => {
+        const opt = document.createElement("option");
+        opt.value = l.email; // we send lecturer email to the backend
+        let label = l.email;
+        if (l.department) label += " • " + l.department;
+        if (l.nidn) label += " • NIDN " + l.nidn;
+        opt.textContent = label;
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error(err);
+      if (messageEl) {
+        messageEl.textContent = "Could not load lecturers: " + err.message;
+        messageEl.classList.remove("hint-success");
+        messageEl.classList.add("hint-error");
+      }
+    }
+  }
+
+  async function loadSupervisorsForPeople() {
+    const list = document.getElementById("supervisors-list");
+    if (!list) return;
+    list.innerHTML = "";
+
+    try {
+      const resp = await fetch("/api/lecturers/supervisees", {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      if (!resp.ok) {
+        throw new Error("Failed to load supervisors (HTTP " + resp.status + ")");
+      }
+      const supervisors = await resp.json();
+
+      if (!Array.isArray(supervisors) || supervisors.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "You do not have any supervisors yet.";
+        list.appendChild(li);
+        return;
+      }
+
+      supervisors.forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = s.email + (s.roleMain ? " (main supervisor)" : "");
+        list.appendChild(li);
+      });
+    } catch (err) {
+      console.error(err);
+      const li = document.createElement("li");
+      li.textContent = "Could not load supervisors: " + err.message;
+      list.appendChild(li);
+    }
+  }
+
+  function setupPeopleSection() {
+    // Only attach the submit handler once
+    if (setupPeopleSection._initialized) return;
+    setupPeopleSection._initialized = true;
+
+    const form = document.getElementById("add-supervisor-form");
+    const select = document.getElementById("supervisor-select");
+    const messageEl = document.getElementById("supervisor-message");
+    if (!form || !select || !messageEl) return;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      messageEl.textContent = "";
+      messageEl.classList.remove("hint-error", "hint-success");
+
+      const email = select.value;
+      if (!email) {
+        messageEl.textContent = "Please choose a lecturer first.";
+        messageEl.classList.add("hint-error");
+        return;
+      }
+
+      try {
+        const resp = await fetch("/api/lecturers/supervisees", {
+          method: "POST",
+          headers: {
+            ...getAuthHeaders(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!resp.ok) {
+          let msg = "Failed to add supervisor (HTTP " + resp.status + ")";
+          try {
+            const body = await resp.json();
+            if (body && body.error) msg = body.error;
+          } catch (_) {}
+          throw new Error(msg);
+        }
+
+        messageEl.textContent =
+          "Supervisor added successfully (or already assigned).";
+        messageEl.classList.add("hint-success");
+
+        // Refresh current supervisor list
+        await loadSupervisorsForPeople();
+      } catch (err) {
+        console.error(err);
+        messageEl.textContent = err.message || "Could not add supervisor.";
+        messageEl.classList.add("hint-error");
+      }
+    });
+  }
+  setupPeopleSection._initialized = false;
+
+
+  function updateAuthUI() {
+    const statusEl = document.getElementById("account-status");
+    const navPeople = document.querySelector(".nav-people");
+    if (currentUser) {
+      statusEl.innerHTML =
+        'Signed in as <strong>' +
+        currentUser.email +
+        "</strong> (" +
+        currentUser.role +
+        ') <button type="button" class="btn btn-outline logout-btn" id="logout-btn">Logout</button>';
+
+      navPeople.classList.remove("hidden");
+      // Attach logout handler
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          currentUser = null;
+          localStorage.removeItem("currentUser");
+          updateAuthUI();
+          alert("You have been logged out on the front-end.");
+        });
+      }
+    } else {
+      statusEl.textContent = "Not signed in";
+      navPeople.classList.add("hidden");
+    }
+  }
+
+  // --- Sidebar navigation events ---
+
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const sectionId = btn.getAttribute("data-section");
+      setActiveSection(sectionId);
+    });
+  });
+
+  // --- Toggle login/register views ---
+
+  const loginView = document.getElementById("login-view");
+  const registerView = document.getElementById("register-view");
+  document.getElementById("show-register-link").addEventListener("click", () => {
+    loginView.classList.add("hidden");
+    registerView.classList.remove("hidden");
+  });
+  document.getElementById("show-login-link").addEventListener("click", () => {
+    registerView.classList.add("hidden");
+    loginView.classList.remove("hidden");
+  });
+
+  // --- Register: faculty → major ---
+  const regFaculty = document.getElementById("reg-faculty");
+  const regMajor = document.getElementById("reg-major");
+  regFaculty.addEventListener("change", () => {
+    populateMajorSelect(regMajor, regFaculty.value, false);
+  });
+
+  // --- Browse: faculty → major ---
+  const browseFaculty = document.getElementById("browse-faculty");
+  const browseMajor = document.getElementById("browse-major");
+  browseFaculty.addEventListener("change", () => {
+    populateMajorSelect(browseMajor, browseFaculty.value, true);
+  });
+  // Initialize browse majors to "All majors"
+  populateMajorSelect(browseMajor, "", true);
+
+  // --- Register: password validation ---
+  const regPassword = document.getElementById("reg-password");
+  const regPasswordConfirm = document.getElementById("reg-password-confirm");
+  const passwordHint = document.getElementById("password-hint");
+  const passwordMatchHint = document.getElementById("password-match-hint");
+
+  function validatePasswordStrength(pwd) {
+    const minLength = pwd.length >= 14;
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasNumber = /[0-9]/.test(pwd);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+    return minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+  }
+
+  regPassword.addEventListener("input", () => {
+    const ok = validatePasswordStrength(regPassword.value);
+    passwordHint.classList.toggle("hint-error", !ok && regPassword.value.length > 0);
+    passwordHint.classList.toggle("hint-success", ok);
+  });
+
+  function updatePasswordMatchHint() {
+    if (!regPasswordConfirm.value && !regPassword.value) {
+      passwordMatchHint.textContent = "";
+      return;
+    }
+    if (regPassword.value === regPasswordConfirm.value) {
+      passwordMatchHint.textContent = "Passwords match.";
+      passwordMatchHint.classList.remove("hint-error");
+      passwordMatchHint.classList.add("hint-success");
+    } else {
+      passwordMatchHint.textContent =
+        "Passwords do not match. Please re-enter the same password.";
+      passwordMatchHint.classList.remove("hint-success");
+      passwordMatchHint.classList.add("hint-error");
+    }
+  }
+
+  regPasswordConfirm.addEventListener("input", updatePasswordMatchHint);
+  regPassword.addEventListener("input", updatePasswordMatchHint);
+
+  // --- Register form submission → POST /api/auth/register-student ---
+
+  document.getElementById("register-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const messageEl = document.getElementById("register-message");
+    messageEl.textContent = "";
+
+    const email = document.getElementById("reg-email").value.trim();
+    const studentNumber = document.getElementById("reg-student-number").value.trim();
+    const faculty = regFaculty.value;
+    const major = regMajor.value;
+    const password = regPassword.value;
+    const confirm = regPasswordConfirm.value;
+
+    if (!validatePasswordStrength(password)) {
+      messageEl.textContent =
+        "Password does not meet the required complexity. Please adjust it.";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+      return;
+    }
+
+    if (password !== confirm) {
+      messageEl.textContent = "Passwords do not match.";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+      return;
+    }
+
+    if (!faculty || !major) {
+      messageEl.textContent = "Please select both faculty and major.";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+      return;
+    }
+
+    // Map to backend payload: studentNumber + program
+    const program = major; // simple mapping; you can include faculty code if you want
+
+    const payload = {
+      email,
+      password,
+      studentNumber,
+      program,
+    };
+
+    try {
+      const resp = await fetch("/api/auth/register-student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (resp.ok) {
+        messageEl.textContent =
+          "Registration successful! You can now log in with your SU email and password.";
+        messageEl.classList.remove("hint-error");
+        messageEl.classList.add("hint-success");
+      } else {
+        let errText = "Registration failed.";
+        try {
+          const data = await resp.json();
+          if (data && data.error) {
+            errText = data.error;
+          }
+        } catch (err) {
+          // ignore parse error
+        }
+        messageEl.textContent = errText;
+        messageEl.classList.add("hint-error");
+        messageEl.classList.remove("hint-success");
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent =
+        "Could not connect to backend. Is the Spring Boot server running on port 8080?";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+    }
+  });
+
+  // --- Login form submission → HTTP Basic (GET /api/theses/mine) ---
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+    const messageEl = document.getElementById("login-message");
+    messageEl.textContent = "";
+
+    if (!email || !password) {
+      messageEl.textContent = "Please fill in both email and password.";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+      return;
+    }
+
+    // For now, assume STUDENT login and test using /api/theses/mine
+    try {
+      const resp = await fetch("/api/theses/mine", {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + btoa(email + ":" + password),
+        },
+      });
+
+      if (resp.ok) {
+        currentUser = {
+          email,
+          password, // stored only on front-end for Basic auth; in a real system you'd use tokens/sessions
+          role: "STUDENT",
+        };
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        messageEl.textContent = "Login successful.";
+        messageEl.classList.remove("hint-error");
+        messageEl.classList.add("hint-success");
+
+        updateAuthUI();
+        // After login, maybe go to Dashboard
+        document
+          .querySelector('.nav-item[data-section="dashboard-section"]')
+          .click();
+      } else if (resp.status === 401) {
+        messageEl.textContent = "Invalid credentials or unauthorized.";
+        messageEl.classList.add("hint-error");
+        messageEl.classList.remove("hint-success");
+      } else if (resp.status === 403) {
+        messageEl.textContent =
+          "Login worked, but this account is not a student (access to /api/theses/mine is forbidden).";
+        messageEl.classList.add("hint-error");
+        messageEl.classList.remove("hint-success");
+      } else {
+        messageEl.textContent = "Login failed with status " + resp.status + ".";
+        messageEl.classList.add("hint-error");
+        messageEl.classList.remove("hint-success");
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent =
+        "Could not connect to backend. Is the Spring Boot server running on port 8080?";
+      messageEl.classList.add("hint-error");
+      messageEl.classList.remove("hint-success");
+    }
+  });
+
+  // --- Browse form: UI-only, echo filters ---
+
+  document.getElementById("add-author-btn").addEventListener("click", () => {
+    const wrapper = document.getElementById("authors-wrapper");
+    const rowCount = wrapper.querySelectorAll(".authors-row").length;
+    const row = document.createElement("div");
+    row.className = "authors-row";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "author-input";
+    input.placeholder = "Author " + (rowCount + 1) + " name";
+    row.appendChild(input);
+    wrapper.appendChild(row);
+  });
+
+  document.getElementById("browse-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const keyword = document.getElementById("browse-keyword").value.trim();
+    const year = document.getElementById("browse-year").value;
+    const faculty = document.getElementById("browse-faculty").value;
+    const major = document.getElementById("browse-major").value;
+    const authors = Array.from(
+      document.querySelectorAll(".author-input")
+    )
+      .map((i) => i.value.trim())
+      .filter((v) => v.length > 0);
+
+    const resultsEl = document.getElementById("browse-results");
+    resultsEl.innerHTML =
+      "<strong>Filters applied (front-end only):</strong><br>" +
+      "Keyword: " +
+      (keyword || "<em>None</em>") +
+      "<br>Year: " +
+      (year || "<em>Any</em>") +
+      "<br>Faculty: " +
+      (faculty || "<em>Any</em>") +
+      "<br>Major: " +
+      (major || "<em>Any</em>") +
+      "<br>Authors: " +
+      (authors.length ? authors.join(", ") : "<em>Any</em>") +
+      "<br><br>" +
+      "Search results from the backend will be displayed here once a search API is implemented.";
+  });
+
+  // --- Initial UI setup ---
+  updateAuthUI();
+</script>
+</body>
+</html>
