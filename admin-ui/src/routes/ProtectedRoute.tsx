@@ -1,0 +1,35 @@
+import { ReactNode } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { User } from '../lib/context/AuthContext';
+
+interface ProtectedRouteProps {
+  user: User | null;
+  loading: boolean;
+  children: ReactNode;
+}
+
+export function ProtectedRoute({ user, loading, children }: ProtectedRouteProps) {
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    // Redirect to login, but save the location they were trying to access
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+}

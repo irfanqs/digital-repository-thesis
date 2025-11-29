@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../lib/context/AuthContext";
 
 interface MeLike {
   id: number;
@@ -23,6 +25,36 @@ function ShellLayout({
   activeNav,
   children,
 }: ShellLayoutProps) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleNavClick = (page: NavKey) => {
+    // Navigate based on role and page
+    const rolePrefix = me.role.toLowerCase();
+    
+    switch (page) {
+      case "dashboard":
+        navigate(`/${rolePrefix}/dashboard`);
+        break;
+      case "account":
+        navigate(`/${rolePrefix}/account`);
+        break;
+      case "home":
+        navigate("/");
+        break;
+      case "browse":
+        navigate("/browse");
+        break;
+      case "help":
+        navigate("/help");
+        break;
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className="app-shell">
       {/* LEFT SIDEBAR */}
@@ -38,6 +70,7 @@ function ShellLayout({
               className={
                 "nav-item" + (activeNav === "dashboard" ? " active" : "")
               }
+              onClick={() => handleNavClick("dashboard")}
             >
               <span>Dashboard</span>
             </button>
@@ -47,6 +80,7 @@ function ShellLayout({
               className={
                 "nav-item" + (activeNav === "account" ? " active" : "")
               }
+              onClick={() => handleNavClick("account")}
             >
               <span>Account</span>
             </button>
@@ -54,6 +88,7 @@ function ShellLayout({
           <li>
             <button
               className={"nav-item" + (activeNav === "home" ? " active" : "")}
+              onClick={() => handleNavClick("home")}
             >
               <span>Home</span>
             </button>
@@ -61,6 +96,7 @@ function ShellLayout({
           <li>
             <button
               className={"nav-item" + (activeNav === "browse" ? " active" : "")}
+              onClick={() => handleNavClick("browse")}
             >
               <span>Browse</span>
             </button>
@@ -68,8 +104,18 @@ function ShellLayout({
           <li>
             <button
               className={"nav-item" + (activeNav === "help" ? " active" : "")}
+              onClick={() => handleNavClick("help")}
             >
               <span>Help</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className="nav-item logout-btn"
+              onClick={handleLogout}
+              style={{ marginTop: "auto", color: "#ff6b6b" }}
+            >
+              <span>Logout</span>
             </button>
           </li>
         </ul>
