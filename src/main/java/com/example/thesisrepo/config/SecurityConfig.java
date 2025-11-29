@@ -3,8 +3,10 @@ package com.example.thesisrepo.config;
 import com.example.thesisrepo.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,6 +37,11 @@ public class SecurityConfig {
   }
 
   @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    return authConfig.getAuthenticationManager();
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
       // we disable CSRF here because the frontend talks to the API with fetch()
@@ -45,6 +52,7 @@ public class SecurityConfig {
         .requestMatchers(
           "/",                // maps to static index.html
           "/index.html",
+          "/login",           // allow React login page
           "/favicon.ico",
           "/assets/**",       // Vite / static assets
           "/css/**",
@@ -58,7 +66,8 @@ public class SecurityConfig {
         .requestMatchers(
           "/api/auth/register-student",
           "/api/auth/register-lecturer",
-          "/api/auth/register-admin"
+          "/api/auth/register-admin",
+          "/api/auth/logout"
         ).permitAll()
 
         // public search endpoints (digital repository)
@@ -78,7 +87,13 @@ public class SecurityConfig {
         .loginPage("/login")  // use the default /login page
         .permitAll()
       )
-      .logout(logout -> logout.permitAll());
+      .logout(logout -> logout
+        .logoutUrl("/logout")
+        .logoutSuccessUrl("/login")
+        .invalidateHttpSession(true)
+        .deleteCookies("JSESSIONID")
+        .permitAll()
+      );
 
     return http.build();
   }

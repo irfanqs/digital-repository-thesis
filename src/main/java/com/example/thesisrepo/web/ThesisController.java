@@ -1,8 +1,12 @@
 package com.example.thesisrepo.web;
 
+import com.example.thesisrepo.profile.LecturerProfile;
+import com.example.thesisrepo.profile.LecturerProfileRepository;
 import com.example.thesisrepo.service.CurrentUserService;
 import com.example.thesisrepo.service.StorageService;
 import com.example.thesisrepo.thesis.*;
+import com.example.thesisrepo.user.User;
+import com.example.thesisrepo.user.UserRepository;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,9 @@ public class ThesisController {
   private final StorageService storage;
   private final ThesisChecklistRepository checklistRepo;
   private final ApprovalRepository approvalRepo;
+  private final LecturerProfileRepository lecturerProfiles;
+  private final UserRepository users;
+  private final SupervisorAssignmentRepository supervisorAssignments;
 
   /** Student's own submissions (multiple attempts supported). */
   @GetMapping("/mine")
@@ -118,6 +125,74 @@ public class ThesisController {
       "checklist", checklistData,
       "approvals", approvalData
     ));
+  }
+
+  /** Get list of all lecturers (for student to choose supervisors) */
+  @GetMapping("/lecturers")
+  @PreAuthorize("hasRole('STUDENT')")
+  public List<LecturerSummaryDto> getAllLecturers() {
+    List<LecturerProfile> allLecturers = lecturerProfiles.findAll();
+    return allLecturers.stream()
+      .map(lp -> new LecturerSummaryDto(
+        lp.getUser().getId(),
+        lp.getUser().getEmail(),
+        lp.getNidn(),
+        lp.getDepartment()
+      ))
+      .toList();
+  }
+
+  /** Get my supervisors (student's current supervisors) */
+  @GetMapping("/supervisors")
+  @PreAuthorize("hasRole('STUDENT')")
+  public List<SupervisorDto> getMySupervisors() {
+    var me = current.requireCurrentUser();
+    List<SupervisorAssignment> assignments = supervisorAssignments.findByStudent(me);
+    
+    return assignments.stream()
+      .map(sa -> new SupervisorDto(
+          sa.getLecturer().getId(),
+          sa.getLecturer().getEmail(),
+          sa.isRoleMain()
+      ))
+      .toList();
+  }
+
+  /** Add a supervisor (student adds lecturer as supervisor) */
+  @PostMapping("/supervisors")
+  @PreAuthorize("hasRole('STUDENT')")
+  public ResponseEntity<?> addSupervisor(@RequestBody AddSupervisorRequest req) {
+    var me = current.requireCurrentUser();
+    
+    // Find lecturer by email
+    var lecturer = users.findByEmail(req.getEmail()).orElse(null);
+    if (lecturer == null || !lecturer.getRole().name().equals("LECTURER")) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Lecturer not found"));
+    }
+
+    // Check if already assigned
+    boolean exists = supervisorAssignments.existsByLecturerAndStudent(lecturer, me);
+    if (exists) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Supervisor already assigned"));
+    }
+
+    // Create assignment
+    SupervisorAssignment sa = SupervisorAssignment.builder()
+      .lecturer(lecturer)
+      .student(me)
+      .roleMain(true)
+      .build();
+    supervisorAssignments.save(sa);
+
+    return ResponseEntity.ok(Map.of("message", "Supervisor added successfully"));
+  }
+
+  record LecturerSummaryDto(Long id, String email, String nidn, String department) {}
+  record SupervisorDto(Long lecturerId, String email, boolean roleMain) {}
+
+  @Data
+  public static class AddSupervisorRequest {
+    private String email;
   }
 
   @Data
