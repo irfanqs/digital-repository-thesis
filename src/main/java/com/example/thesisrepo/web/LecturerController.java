@@ -2,6 +2,8 @@ package com.example.thesisrepo.web;
 
 import com.example.thesisrepo.profile.LecturerProfile;
 import com.example.thesisrepo.profile.LecturerProfileRepository;
+import com.example.thesisrepo.profile.StudentProfile;
+import com.example.thesisrepo.profile.StudentProfileRepository;
 import com.example.thesisrepo.service.CurrentUserService;
 import com.example.thesisrepo.thesis.*;
 import com.example.thesisrepo.user.Role;
@@ -31,6 +33,7 @@ public class LecturerController {
   private final ThesisRepository theses;
   private final SupervisorAssignmentRepository assignments;
   private final LecturerProfileRepository lecturerProfiles;
+  private final StudentProfileRepository studentProfiles;
   private final ThesisChecklistRepository checklistRepo;
   private final ApprovalRepository approvalRepo;
 
@@ -116,6 +119,44 @@ public class LecturerController {
   // ─────────────────────────────────────────────────────────────────────
   // 3. Lecturer portal: view theses of supervisees
   // ─────────────────────────────────────────────────────────────────────
+
+  /**
+   * For a lecturer, list all supervisees (students who assigned this lecturer as supervisor).
+   *
+   * GET /api/lecturers/my-supervisees
+   */
+  @GetMapping("/my-supervisees")
+  @PreAuthorize("hasRole('LECTURER')")
+  public List<Map<String, Object>> mySupervisees() {
+    var me = current.requireCurrentUser();
+
+    // Find all students linked to this lecturer
+    var assignments_list = assignments.findByLecturerId(me.getId());
+    List<Map<String, Object>> out = new ArrayList<>();
+
+    for (SupervisorAssignment a : assignments_list) {
+      User student = a.getStudent();
+      String fullName = student.getEmail();
+      
+      // Try to get profile info
+      StudentProfile profile = studentProfiles.findById(student.getId()).orElse(null);
+      if (profile != null && profile.getName() != null) {
+        fullName = profile.getName();
+      }
+      
+      // Count theses for this student
+      long thesisCount = theses.findByStudentId(student.getId()).size();
+      
+      out.add(Map.of(
+        "studentId", student.getId(),
+        "email", student.getEmail(),
+        "fullName", fullName,
+        "submissionCount", thesisCount
+      ));
+    }
+
+    return out;
+  }
 
   /**
    * For a lecturer, list all theses submitted by their supervisees.

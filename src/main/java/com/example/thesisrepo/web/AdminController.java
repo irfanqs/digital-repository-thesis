@@ -240,40 +240,45 @@ public class AdminController {
   // ──────────────────────────────────────────────────────────────────────────
 
   /**
-   * List students with optional filters by name, program, or faculty
+   * List / search student accounts so admin can verify registration.
+   *
    * - GET /api/admin/students
    *      → list all students
-   * - GET /api/admin/students?name=ahmad
-   *      → filter by name (contains, case-insensitive)
-   * - GET /api/admin/students?program=S1
-   *      → filter by program
-   * - GET /api/admin/students?faculty=FMIPA
-   *      → filter by faculty
+   * - GET /api/admin/students?email=foo@bar
+   *      → filter by email (exact match)
+   * - GET /api/admin/students?studentNumber=123
+   *      → filter by student number
    */
   @GetMapping("/students")
   @PreAuthorize("hasRole('ADMIN')")
   public List<StudentAccountDto> listStudents(
-      @RequestParam(required = false) String name,
-      @RequestParam(required = false) String program,
-      @RequestParam(required = false) String faculty
+      @RequestParam(required = false) String email,
+      @RequestParam(required = false) String studentNumber
   ) {
+    // search by email, if provided
+    if (email != null && !email.isBlank()) {
+      return users.findByEmail(email)
+        .filter(u -> u.getRole() == Role.STUDENT)
+        .map(u -> {
+          StudentProfile profile =
+            studentProfiles.findByUserId(u.getId()).orElse(null);
+          return StudentAccountDto.from(u, profile);
+        })
+        .map(List::of)
+        .orElseGet(List::of);
+    }
+
+    // or search by student number
+    if (studentNumber != null && !studentNumber.isBlank()) {
+      return studentProfiles.findByStudentNumber(studentNumber)
+        .map(p -> StudentAccountDto.from(p.getUser(), p))
+        .map(List::of)
+        .orElseGet(List::of);
+    }
+
+    // otherwise, list all students
     return studentProfiles.findAll().stream()
       .map(p -> StudentAccountDto.from(p.getUser(), p))
-      .filter(dto -> {
-        if (name != null && !name.isBlank() 
-            && (dto.name() == null || !dto.name().toLowerCase().contains(name.toLowerCase()))) {
-          return false;
-        }
-        if (program != null && !program.isBlank()
-            && (dto.program() == null || !dto.program().toLowerCase().contains(program.toLowerCase()))) {
-          return false;
-        }
-        if (faculty != null && !faculty.isBlank()
-            && (dto.faculty() == null || !dto.faculty().toLowerCase().contains(faculty.toLowerCase()))) {
-          return false;
-        }
-        return true;
-      })
       .toList();
   }
 
@@ -291,6 +296,39 @@ public class AdminController {
         return LecturerAccountDto.from(u, profile);
       })
       .toList();
+  }
+
+  /**
+   * List all thesis submissions for admin review
+   * GET /api/admin/submissions
+   */
+  @GetMapping("/submissions")
+  @PreAuthorize("hasRole('ADMIN')")
+  public List<Map<String, Object>> listSubmissions() {
+    List<Map<String, Object>> result = new ArrayList<>();
+    
+    for (Thesis thesis : theses.findAll()) {
+      // Use thesis.studentName as primary source (set when thesis is submitted)
+      String studentName = thesis.getStudentName();
+      if (studentName == null || studentName.isBlank()) {
+        // Fallback: try to get from StudentProfile
+        User student = thesis.getStudent();
+        StudentProfile studentProfile = studentProfiles.findById(student.getId()).orElse(null);
+        studentName = studentProfile != null && studentProfile.getName() != null ? 
+          studentProfile.getName() : student.getEmail();
+      }
+      
+      result.add(Map.of(
+        "submissionId", thesis.getId(),
+        "studentId", thesis.getStudent().getId(),
+        "studentName", studentName,
+        "thesisTitle", thesis.getTitle() != null ? thesis.getTitle() : "--",
+        "status", thesis.getCurrentStatus() != null ? thesis.getCurrentStatus().name() : "--",
+        "submittedDate", thesis.getSubmittedAt() != null ? thesis.getSubmittedAt().toString() : "--"
+      ));
+    }
+    
+    return result;
   }
 
   // ──────────────────────────────────────────────────────────────────────────

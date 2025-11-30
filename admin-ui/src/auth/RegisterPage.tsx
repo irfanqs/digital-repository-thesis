@@ -48,6 +48,7 @@ const FACULTIES: Faculty[] = [
 
 function RegisterPage() {
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [studentNumber, setStudentNumber] = useState("");
   const [faculty, setFaculty] = useState("");
   const [program, setProgram] = useState("");
@@ -62,12 +63,12 @@ function RegisterPage() {
   const majors = selectedFaculty?.majors || [];
 
   const validatePassword = (pwd: string): boolean => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special char
+    // At least 14 characters, 1 uppercase, 1 lowercase, 1 number, 1 special char
     const hasUpperCase = /[A-Z]/.test(pwd);
     const hasLowerCase = /[a-z]/.test(pwd);
     const hasNumber = /[0-9]/.test(pwd);
     const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
-    const isLongEnough = pwd.length >= 8;
+    const isLongEnough = pwd.length >= 14;
 
     return hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isLongEnough;
   };
@@ -80,7 +81,7 @@ function RegisterPage() {
 
     try {
       // Validation
-      if (!email || !studentNumber || !faculty || !program || !password) {
+      if (!email || !fullName || !studentNumber || !faculty || !program || !password) {
         setError("All fields are required");
         setLoading(false);
         return;
@@ -88,7 +89,7 @@ function RegisterPage() {
 
       if (!validatePassword(password)) {
         setError(
-          "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+          "Password must be at least 14 characters with uppercase, lowercase, number, and special character"
         );
         setLoading(false);
         return;
@@ -109,6 +110,7 @@ function RegisterPage() {
         body: JSON.stringify({
           email,
           password,
+          fullName,
           studentNumber,
           program,
         }),
@@ -184,6 +186,37 @@ function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="student@my.sampoernauniversity.ac.id"
+              style={{
+                width: "100%",
+                padding: "12px",
+                border: "1px solid #ddd",
+                borderRadius: "6px",
+                fontSize: "14px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Full Name */}
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="fullName"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: 500,
+                color: "#333",
+              }}
+            >
+              Full Name
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              placeholder="e.g., Budi Santoso"
               style={{
                 width: "100%",
                 padding: "12px",
@@ -353,7 +386,7 @@ function RegisterPage() {
                 marginBottom: 0,
               }}
             >
-              Must include: uppercase, lowercase, number, and special character (min. 8 chars)
+              Must include: uppercase, lowercase, number, and special character (min. 14 chars)
             </p>
           </div>
 

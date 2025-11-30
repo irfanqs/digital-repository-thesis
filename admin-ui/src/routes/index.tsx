@@ -15,6 +15,18 @@ import LecturerDashboard from '../lecturer/LecturerDashboard';
 import StudentListPage from '../admin/pages/StudentListPage';
 import LecturerListPage from '../admin/pages/LecturerListPage';
 import SubmissionListPage from '../admin/pages/SubmissionListPage';
+import AdminPublishPage from '../admin/pages/AdminPublishPage';
+import AdminBrowsePage from '../admin/pages/AdminBrowsePage';
+
+// Student Pages
+import StudentAccountPage from '../student/pages/StudentAccountPage';
+import StudentSubmitPage from '../student/pages/StudentSubmitPage';
+import StudentHelpPage from '../student/pages/StudentHelpPage';
+
+// Lecturer Pages
+import LecturerAccountPage from '../lecturer/pages/LecturerAccountPage';
+import LecturerBrowsePage from '../lecturer/pages/LecturerBrowsePage';
+import LecturerSuperviseeDetailPage from '../lecturer/pages/LecturerSuperviseeDetailPage';
 
 interface AppRoutesProps {
   user: User | null;
@@ -65,7 +77,17 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
         element={
           <ProtectedRoute user={user} loading={loading}>
             <RoleGuard user={user} allowedRoles={['ADMIN']}>
-              <SubmissionListPage me={user!} />
+              <AdminPublishPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/browse"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['ADMIN']}>
+              <AdminBrowsePage me={user!} />
             </RoleGuard>
           </ProtectedRoute>
         }
@@ -100,10 +122,27 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
         element={
           <ProtectedRoute user={user} loading={loading}>
             <RoleGuard user={user} allowedRoles={['STUDENT']}>
-              <div style={{ padding: '2rem' }}>
-                <h1>Student Account Settings</h1>
-                <p>Account management page - Coming soon</p>
-              </div>
+              <StudentAccountPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/submissions"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['STUDENT']}>
+              <StudentSubmitPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/help"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['STUDENT']}>
+              <StudentHelpPage me={user!} />
             </RoleGuard>
           </ProtectedRoute>
         }
@@ -125,9 +164,39 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
         element={
           <ProtectedRoute user={user} loading={loading}>
             <RoleGuard user={user} allowedRoles={['LECTURER']}>
+              <LecturerAccountPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lecturer/browse"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['LECTURER']}>
+              <LecturerBrowsePage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lecturer/supervisee/:studentId"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['LECTURER']}>
+              <LecturerSuperviseeDetailPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lecturer/help"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['LECTURER']}>
               <div style={{ padding: '2rem' }}>
-                <h1>Lecturer Account Settings</h1>
-                <p>Account management page - Coming soon</p>
+                <h1>Help & Documentation</h1>
+                <p>Help page - Coming soon</p>
               </div>
             </RoleGuard>
           </ProtectedRoute>
@@ -146,12 +215,7 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
       />
       <Route 
         path="/browse" 
-        element={
-          <div style={{ padding: '2rem' }}>
-            <h1>Browse Theses</h1>
-            <p>Public thesis repository - Coming soon</p>
-          </div>
-        } 
+        element={<Navigate to="/" replace />}
       />
       <Route 
         path="/help" 

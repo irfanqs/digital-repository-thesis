@@ -55,7 +55,7 @@ function ShellLayout({
         navigate("/");
         break;
       case "help":
-        navigate("/help");
+        navigate(`/${rolePrefix}/help`);
         break;
     }
   };
@@ -84,7 +84,7 @@ function ShellLayout({
               className={"nav-item" + (activeNav === "students" ? " active" : "")}
               onClick={() => handleNavClick("students")}
             >
-              <span>View Student List</span>
+              <span>View Student</span>
             </button>
           </li>
           <li>
@@ -92,7 +92,7 @@ function ShellLayout({
               className={"nav-item" + (activeNav === "lecturers" ? " active" : "")}
               onClick={() => handleNavClick("lecturers")}
             >
-              <span>View Lecturer List</span>
+              <span>View Lecturer</span>
             </button>
           </li>
           <li>
@@ -100,7 +100,7 @@ function ShellLayout({
               className={"nav-item" + (activeNav === "submissions" ? " active" : "")}
               onClick={() => handleNavClick("submissions")}
             >
-              <span>View Student Submission</span>
+              <span>Publish</span>
             </button>
           </li>
           <li>
@@ -108,7 +108,7 @@ function ShellLayout({
               className={"nav-item" + (activeNav === "browse" ? " active" : "")}
               onClick={() => handleNavClick("browse")}
             >
-              <span>Browse Published Thesis</span>
+              <span>Browse</span>
             </button>
           </li>
         </>
@@ -131,7 +131,7 @@ function ShellLayout({
               className={"nav-item" + (activeNav === "browse" ? " active" : "")}
               onClick={() => handleNavClick("browse")}
             >
-              <span>Browse Repository</span>
+              <span>Browse</span>
             </button>
           </li>
           <li>
@@ -159,18 +159,18 @@ function ShellLayout({
           </li>
           <li>
             <button
-              className="nav-item"
-              onClick={() => navigate("/student/dashboard#supervisors")}
+              className={"nav-item" + (activeNav === "account" ? " active" : "")}
+              onClick={() => handleNavClick("account")}
             >
-              <span>Supervisors</span>
+              <span>Account</span>
             </button>
           </li>
           <li>
             <button
-              className="nav-item"
-              onClick={() => navigate("/student/dashboard#submission")}
+              className={"nav-item" + (activeNav === "submissions" ? " active" : "")}
+              onClick={() => handleNavClick("submissions")}
             >
-              <span>Thesis Submission</span>
+              <span>Submit</span>
             </button>
           </li>
           <li>

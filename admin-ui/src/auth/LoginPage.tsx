@@ -189,7 +189,7 @@ function LoginPage() {
           </p>
         </div>
 
-        <div
+        {/* <div
           style={{
             marginTop: "30px",
             padding: "16px",
@@ -206,7 +206,7 @@ function LoginPage() {
           <p style={{ margin: "4px 0" }}>
             <strong>Lecturer:</strong> lecturer@univ.local / Lecturer123!
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -42,7 +42,9 @@ public class AuthController {
                 .build());
 
         studentProfiles.save(StudentProfile.builder()
+                .userId(u.getId())
                 .user(u)
+                .name(payload.getFullName())
                 .studentNumber(payload.getStudentNumber())
                 .program(payload.getProgram())
                 .build());
@@ -57,7 +59,24 @@ public class AuthController {
     @GetMapping("/me")
     public MeResponse me() {
         User user = currentUserService.requireCurrentUser();
-        return new MeResponse(user.getId(), user.getEmail(), user.getRole());
+        
+        // Get profile data based on role
+        String fullName = null;
+        String studentId = null;
+        String faculty = null;
+        String major = null;
+        
+        if (user.getRole() == Role.STUDENT) {
+            StudentProfile profile = studentProfiles.findById(user.getId()).orElse(null);
+            if (profile != null) {
+                fullName = profile.getName();
+                studentId = profile.getStudentNumber();
+                faculty = profile.getFaculty();
+                major = profile.getProgram();
+            }
+        }
+        
+        return new MeResponse(user.getId(), user.getEmail(), user.getRole(), fullName, studentId, faculty, major);
     }
 
     @PostMapping("/login")
@@ -85,7 +104,23 @@ public class AuthController {
             // Get user details
             User user = currentUserService.requireCurrentUser();
             
-            return ResponseEntity.ok(new MeResponse(user.getId(), user.getEmail(), user.getRole()));
+            // Get profile data based on role
+            String fullName = null;
+            String studentId = null;
+            String faculty = null;
+            String major = null;
+            
+            if (user.getRole() == Role.STUDENT) {
+                StudentProfile profile = studentProfiles.findById(user.getId()).orElse(null);
+                if (profile != null) {
+                    fullName = profile.getName();
+                    studentId = profile.getStudentNumber();
+                    faculty = profile.getFaculty();
+                    major = profile.getProgram();
+                }
+            }
+            
+            return ResponseEntity.ok(new MeResponse(user.getId(), user.getEmail(), user.getRole(), fullName, studentId, faculty, major));
         } catch (org.springframework.security.core.AuthenticationException e) {
             return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
         }
@@ -117,7 +152,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
-    public record MeResponse(Long id, String email, Role role) {}
+    public record MeResponse(Long id, String email, Role role, String fullName, String studentId, String faculty, String major) {}
 
     @Data
     public static class StudentRegister {
@@ -126,6 +161,8 @@ public class AuthController {
         private String email;
         @NotBlank
         private String password;
+        @NotBlank
+        private String fullName;
         @NotBlank
         private String studentNumber;
         private String program;

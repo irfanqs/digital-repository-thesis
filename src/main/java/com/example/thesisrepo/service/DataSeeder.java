@@ -61,6 +61,14 @@ public class DataSeeder implements CommandLineRunner {
       "Computer Science",
       "Faculty of Engineering and Technology (FET)"
     );
+    seedStudent(
+      "student1@univ.local",
+      "Student123!",
+      "Student1",
+      "STU003",
+      "Computer Science",
+      "Faculty of Engineering and Technology (FET)"
+    );
     
     // Seed dummy theses
     seedDummyTheses();
@@ -85,6 +93,7 @@ public class DataSeeder implements CommandLineRunner {
         .build());
       
       lecturerProfiles.save(LecturerProfile.builder()
+        .userId(user.getId())
         .user(user)
         .name(name)
         .department(department)
@@ -103,6 +112,7 @@ public class DataSeeder implements CommandLineRunner {
         .build());
       
       studentProfiles.save(StudentProfile.builder()
+        .userId(user.getId())
         .user(user)
         .name(name)
         .studentNumber(studentNumber)
@@ -121,39 +131,35 @@ public class DataSeeder implements CommandLineRunner {
     User ahmadRizki = users.findByEmail("ahmad.rizki@student.sampoernauniversity.ac.id").orElse(null);
     User sitiNurhaliza = users.findByEmail("siti.nurhaliza@student.sampoernauniversity.ac.id").orElse(null);
     
-    // Fallback to admin if students don't exist
-    User dummyStudent = users.findByEmail("admin@univ.local").orElse(null);
-    if (ahmadRizki == null) ahmadRizki = dummyStudent;
-    if (sitiNurhaliza == null) sitiNurhaliza = dummyStudent;
-    
-    if (dummyStudent == null) {
+    // If students don't exist, we can't seed theses - just return
+    if (ahmadRizki == null || sitiNurhaliza == null) {
       return;
     }
 
-    // Thesis 1 - Siti Nurhaliza
+    // Thesis 1 - Siti Nurhaliza with Rafie Djajasoepena
     thesisRepository.save(Thesis.builder()
       .student(sitiNurhaliza)
       .title("Blockchain Technology for Supply Chain Transparency in Indonesia")
       .abstractText("This study investigates the implementation of blockchain technology to enhance transparency and traceability in Indonesian supply chains. Through a pilot project with local manufacturers, we demonstrated how distributed ledger technology can reduce fraud, improve accountability, and streamline logistics operations across multiple stakeholders.")
       .studentName("Siti Nurhaliza")
       .supervisorName("Rafie Djajasoepena")
-      .program("Information Systems")
+      .program("Computer Science")
       .submissionYear(2024)
       .yearPublished(2024)
       .faculty("Faculty of Engineering and Technology (FET)")
-      .major("Information Systems")
+      .major("Computer Science")
       .keywords("blockchain, supply chain, transparency, distributed ledger")
       .currentStatus(Thesis.ThesisStatus.PUBLISHED)
       .publishedAt(Instant.now())
       .submittedAt(Instant.now())
       .build());
 
-    // Thesis 3
+    // Thesis 2 - Ahmad Rizki with Wandy
     thesisRepository.save(Thesis.builder()
-      .student(dummyStudent)
+      .student(ahmadRizki)
       .title("Natural Language Processing for Sentiment Analysis of Indonesian Social Media")
       .abstractText("This research develops NLP models specifically tuned for Indonesian language sentiment analysis on social media platforms. Using a dataset of over 500,000 Indonesian tweets, we achieved 88% accuracy in sentiment classification. The findings provide valuable insights for businesses and policymakers monitoring public opinion in Indonesia.")
-      .studentName("Budi Santoso")
+      .studentName("Ahmad Rizki")
       .supervisorName("Wandy")
       .program("Information Systems")
       .submissionYear(2023)
@@ -166,36 +172,36 @@ public class DataSeeder implements CommandLineRunner {
       .submittedAt(Instant.now())
       .build());
 
-    // Thesis 4
+    // Thesis 3 - Ahmad Rizki with Rafie Djajasoepena
     thesisRepository.save(Thesis.builder()
-      .student(dummyStudent)
+      .student(ahmadRizki)
       .title("Cloud-Native Architecture for E-Commerce Scalability")
       .abstractText("This thesis presents a cloud-native architecture design for high-traffic e-commerce platforms. By leveraging microservices, containerization, and serverless computing, we achieved 10x improvement in scalability while reducing infrastructure costs by 40%. The research includes detailed performance benchmarks and cost analysis.")
-      .studentName("Dewi Lestari")
+      .studentName("Ahmad Rizki")
       .supervisorName("Rafie Djajasoepena")
-      .program("Computer Science")
+      .program("Information Systems")
       .submissionYear(2023)
       .yearPublished(2023)
       .faculty("Faculty of Engineering and Technology (FET)")
-      .major("Computer Science")
+      .major("Information Systems")
       .keywords("cloud computing, microservices, e-commerce, scalability")
       .currentStatus(Thesis.ThesisStatus.PUBLISHED)
       .publishedAt(Instant.now())
       .submittedAt(Instant.now())
       .build());
 
-    // Thesis 5
+    // Thesis 4 - Siti Nurhaliza with Wandy
     thesisRepository.save(Thesis.builder()
-      .student(dummyStudent)
+      .student(sitiNurhaliza)
       .title("Cybersecurity Framework for Indonesian Banking Systems")
       .abstractText("This study proposes a comprehensive cybersecurity framework tailored for Indonesian banking institutions. Drawing from international best practices and local regulatory requirements, the framework addresses common vulnerabilities and provides actionable security measures. Implementation at a regional bank showed 65% reduction in security incidents.")
-      .studentName("Michael Chen")
+      .studentName("Siti Nurhaliza")
       .supervisorName("Wandy")
-      .program("Information Systems")
+      .program("Computer Science")
       .submissionYear(2024)
       .yearPublished(2024)
       .faculty("Faculty of Engineering and Technology (FET)")
-      .major("Information Systems")
+      .major("Computer Science")
       .keywords("cybersecurity, banking, risk management, Indonesia")
       .currentStatus(Thesis.ThesisStatus.PUBLISHED)
       .publishedAt(Instant.now())
