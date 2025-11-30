@@ -410,7 +410,7 @@
         </div>
         <p class="hint">
           This is a prototype connected to the <strong>Spring Boot backend</strong>. Right now:
-          <br>• Register → <code>POST /api/auth/register-student</code>
+          <br>• Register → <code>POST /api/auth/register</code>
           <br>• Login (student) → HTTP Basic, checking <code>GET /api/theses/mine</code>
           <br>• Browse → UI only (search API to be added later)
         </p>
@@ -1048,7 +1048,7 @@
     };
 
     try {
-      const resp = await fetch("/api/auth/register-student", {
+      const resp = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

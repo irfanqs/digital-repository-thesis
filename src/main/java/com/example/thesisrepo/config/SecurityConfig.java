@@ -64,14 +64,15 @@ public class SecurityConfig {
 
         // public registration endpoints
         .requestMatchers(
-          "/api/auth/register-student",
-          "/api/auth/register-lecturer",
-          "/api/auth/register-admin",
+          "/api/auth/register",
           "/api/auth/logout"
         ).permitAll()
 
         // public search endpoints (digital repository)
         .requestMatchers("/api/public/**").permitAll()
+
+        // student-facing lecturer endpoints
+        .requestMatchers("/api/lecturers/list", "/api/lecturers/supervisees").hasAnyRole("STUDENT", "ADMIN")
 
         // role-protected API areas
         .requestMatchers("/api/admin/**").hasRole("ADMIN")

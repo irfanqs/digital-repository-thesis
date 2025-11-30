@@ -13,8 +13,12 @@ public class StudentProfile {
   @JoinColumn(name="user_id")
   private User user;
 
+  private String name;
+
   @Column(nullable=false, unique=true)
   private String studentNumber;
 
   private String program;
+  
+  private String faculty;
 }

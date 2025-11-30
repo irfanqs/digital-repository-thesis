@@ -3,13 +3,19 @@ import { FormEvent, useEffect, useState } from "react";
 interface LecturerSummary {
   id: number;
   email: string;
-  nidn: string | null;
+  name: string | null;
   department: string | null;
+  faculty: string | null;
+  major: string | null;
 }
 
 interface SupervisorRow {
   lecturerId: number;
   email: string;
+  name: string | null;
+  department: string | null;
+  faculty: string | null;
+  major: string | null;
   roleMain: boolean;
 }
 
@@ -25,40 +31,96 @@ function SupervisorsSection() {
 
   // Load all lecturers for the dropdown
   useEffect(() => {
+    let mounted = true;
+    
     const loadLecturers = async () => {
       try {
-        const res = await fetch("/api/theses/lecturers", {
+        const res = await fetch("/api/lecturers/list", {
           credentials: "include",
         });
+        
+        if (!mounted) return;
+        
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("Session expired. Please login again.");
+        }
         if (!res.ok) {
           throw new Error(`Failed to load lecturers (HTTP ${res.status})`);
         }
-        const data = (await res.json()) as LecturerSummary[];
-        setLecturers(data);
+        
+        const data = await res.json();
+        
+        if (!mounted) return;
+        
+        // Validate and filter data
+        if (Array.isArray(data)) {
+          const validData = data
+            .filter(l => l && typeof l.id === 'number' && typeof l.email === 'string')
+            .map(l => ({
+              id: l.id,
+              email: l.email,
+              name: l.name ?? null,
+              department: l.department ?? null,
+              faculty: l.faculty ?? null,
+              major: l.major ?? null,
+            }));
+          setLecturers(validData);
+        } else {
+          console.error("Lecturers data is not an array:", data);
+          setLecturers([]);
+        }
       } catch (err: any) {
-        console.error(err);
+        if (!mounted) return;
+        console.error("Error loading lecturers:", err);
         setAddError(err.message ?? "Failed to load lecturers list.");
       } finally {
-        setLoadingLecturers(false);
+        if (mounted) {
+          setLoadingLecturers(false);
+        }
       }
     };
 
     loadLecturers();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Load my current supervisors
   const loadSupervisors = async () => {
     try {
-      const res = await fetch("/api/theses/supervisors", {
+      const res = await fetch("/api/lecturers/supervisees", {
         credentials: "include",
       });
+      if (res.status === 401 || res.status === 403) {
+        throw new Error("Session expired. Please login again.");
+      }
       if (!res.ok) {
         throw new Error(`Failed to load supervisors (HTTP ${res.status})`);
       }
-      const data = (await res.json()) as SupervisorRow[];
-      setSupervisors(data);
+      const data = await res.json();
+      
+      // Validate and filter data
+      if (Array.isArray(data)) {
+        const validData = data
+          .filter(s => s && typeof s.lecturerId === 'number')
+          .map(s => ({
+            lecturerId: s.lecturerId,
+            email: s.email,
+            name: s.name ?? null,
+            department: s.department ?? null,
+            faculty: s.faculty ?? null,
+            major: s.major ?? null,
+            roleMain: Boolean(s.roleMain),
+          }));
+        setSupervisors(validData);
+      } else {
+        console.error("Supervisors data is not an array:", data);
+        setSupervisors([]);
+      }
     } catch (err: any) {
-      console.error(err);
+      console.error("Error loading supervisors:", err);
       setAddError(err.message ?? "Failed to load supervisors.");
     } finally {
       setLoadingSupervisors(false);
@@ -66,7 +128,15 @@ function SupervisorsSection() {
   };
 
   useEffect(() => {
-    loadSupervisors();
+    let mounted = true;
+    
+    loadSupervisors().then(() => {
+      if (!mounted) return;
+    });
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleAddSupervisor = async (e: FormEvent) => {
@@ -88,7 +158,7 @@ function SupervisorsSection() {
     }
 
     try {
-      const res = await fetch("/api/theses/supervisors", {
+      const res = await fetch("/api/lecturers/supervisees", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -97,6 +167,9 @@ function SupervisorsSection() {
         body: JSON.stringify({ email: lecturer.email }),
       });
 
+      if (res.status === 401 || res.status === 403) {
+        throw new Error("Session expired. Please login again.");
+      }
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         const message =
@@ -132,14 +205,22 @@ function SupervisorsSection() {
           <table className="table">
             <thead>
               <tr>
+                <th>Name</th>
                 <th>Email</th>
+                <th>Department</th>
+                <th>Faculty</th>
+                <th>Major</th>
                 <th>Main Supervisor?</th>
               </tr>
             </thead>
             <tbody>
               {supervisors.map((s) => (
                 <tr key={s.lecturerId}>
+                  <td>{s.name || "N/A"}</td>
                   <td>{s.email}</td>
+                  <td>{s.department || "N/A"}</td>
+                  <td>{s.faculty || "N/A"}</td>
+                  <td>{s.major || "N/A"}</td>
                   <td>{s.roleMain ? "Yes" : "No"}</td>
                 </tr>
               ))}
@@ -174,13 +255,20 @@ function SupervisorsSection() {
                 onChange={(e) => setSelectedLecturerId(e.target.value)}
               >
                 <option value="">-- Choose lecturer --</option>
-                {lecturers.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.email}
-                    {l.department ? ` • ${l.department}` : ""}
-                    {l.nidn ? ` • NIDN ${l.nidn}` : ""}
-                  </option>
-                ))}
+                {lecturers.map((l) => {
+                  const displayName = l.name || l.email || "Unknown";
+                  const details = [
+                    l.major,
+                    l.department,
+                    l.faculty
+                  ].filter(Boolean).join(" • ");
+                  
+                  return (
+                    <option key={l.id} value={String(l.id)}>
+                      {displayName}{details ? ` • ${details}` : ""}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 

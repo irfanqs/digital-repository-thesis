@@ -136,8 +136,10 @@ public class ThesisController {
       .map(lp -> new LecturerSummaryDto(
         lp.getUser().getId(),
         lp.getUser().getEmail(),
-        lp.getNidn(),
-        lp.getDepartment()
+        lp.getName(),
+        lp.getDepartment(),
+        lp.getFaculty(),
+        lp.getMajor()
       ))
       .toList();
   }
@@ -150,11 +152,22 @@ public class ThesisController {
     List<SupervisorAssignment> assignments = supervisorAssignments.findByStudent(me);
     
     return assignments.stream()
-      .map(sa -> new SupervisorDto(
-          sa.getLecturer().getId(),
-          sa.getLecturer().getEmail(),
-          sa.isRoleMain()
-      ))
+      .map(sa -> {
+        var lecturerProfile = lecturerProfiles.findById(sa.getLecturer().getId()).orElse(null);
+        String lecturerName = lecturerProfile != null ? lecturerProfile.getName() : null;
+        String department = lecturerProfile != null ? lecturerProfile.getDepartment() : null;
+        String faculty = lecturerProfile != null ? lecturerProfile.getFaculty() : null;
+        String major = lecturerProfile != null ? lecturerProfile.getMajor() : null;
+        return new SupervisorDto(
+            sa.getLecturer().getId(),
+            sa.getLecturer().getEmail(),
+            lecturerName,
+            department,
+            faculty,
+            major,
+            sa.isRoleMain()
+        );
+      })
       .toList();
   }
 
@@ -187,8 +200,8 @@ public class ThesisController {
     return ResponseEntity.ok(Map.of("message", "Supervisor added successfully"));
   }
 
-  record LecturerSummaryDto(Long id, String email, String nidn, String department) {}
-  record SupervisorDto(Long lecturerId, String email, boolean roleMain) {}
+  record LecturerSummaryDto(Long id, String email, String name, String department, String faculty, String major) {}
+  record SupervisorDto(Long lecturerId, String email, String name, String department, String faculty, String major, boolean roleMain) {}
 
   @Data
   public static class AddSupervisorRequest {

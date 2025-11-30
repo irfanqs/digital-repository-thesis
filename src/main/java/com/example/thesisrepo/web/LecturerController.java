@@ -99,9 +99,14 @@ public class LecturerController {
 
     for (SupervisorAssignment a : links) {
       User lect = a.getLecturer();
+      var profile = lecturerProfiles.findById(lect.getId()).orElse(null);
       out.add(Map.of(
         "lecturerId", lect.getId(),
         "email", lect.getEmail(),
+        "name", profile != null ? profile.getName() : null,
+        "department", profile != null ? profile.getDepartment() : null,
+        "faculty", profile != null ? profile.getFaculty() : null,
+        "major", profile != null ? profile.getMajor() : null,
         "roleMain", a.isRoleMain()
       ));
     }
@@ -225,8 +230,10 @@ public class LecturerController {
       out.add(new LecturerSummary(
         u.getId(),
         u.getEmail(),
-        lp.getNidn(),
-        lp.getDepartment()
+        lp.getName(),
+        lp.getDepartment(),
+        lp.getFaculty(),
+        lp.getMajor()
       ));
     }
     return out;
@@ -243,7 +250,9 @@ public class LecturerController {
   public record LecturerSummary(
     Long id,
     String email,
-    String nidn,
-    String department
+    String name,
+    String department,
+    String faculty,
+    String major
   ) {}
 }

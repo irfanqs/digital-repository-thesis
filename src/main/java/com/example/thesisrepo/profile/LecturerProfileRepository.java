@@ -5,5 +5,4 @@ import java.util.Optional;
 
 public interface LecturerProfileRepository extends JpaRepository<LecturerProfile, Long> {
   Optional<LecturerProfile> findByUserId(Long userId);
-  Optional<LecturerProfile> findByNidn(String nidn);
 }

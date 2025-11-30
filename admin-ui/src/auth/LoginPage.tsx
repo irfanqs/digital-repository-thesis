@@ -41,7 +41,7 @@ function LoginPage() {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(180deg, #0b3c68, #1f6fb2)",
       }}
     >
       <div
@@ -157,12 +157,12 @@ function LoginPage() {
             }}
             onMouseEnter={(e) => {
               if (!loading) {
-                (e.target as HTMLButtonElement).style.background = "#5568d3";
+                (e.target as HTMLButtonElement).style.background = "#0b3c68";
               }
             }}
             onMouseLeave={(e) => {
               if (!loading) {
-                (e.target as HTMLButtonElement).style.background = "#667eea";
+                (e.target as HTMLButtonElement).style.background = "#1f6fb2";
               }
             }}
           >
@@ -181,8 +181,8 @@ function LoginPage() {
           <p style={{ margin: 0 }}>
             Need an account?{" "}
             <a
-              href="http://localhost:8080"
-              style={{ color: "#667eea", textDecoration: "none" }}
+              href="/register"
+              style={{ color: "#1f6fb2", textDecoration: "none" }}
             >
               Register here
             </a>

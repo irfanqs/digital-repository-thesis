@@ -5,9 +5,16 @@ import { RoleGuard } from './RoleGuard';
 
 // Pages
 import LoginPage from '../auth/LoginPage';
+import RegisterPage from '../auth/RegisterPage';
+import HomePage from '../pages/HomePage';
 import AdminDashboard from '../admin/AdminDashboard';
 import StudentDashboard from '../student/StudentDashboard';
 import LecturerDashboard from '../lecturer/LecturerDashboard';
+
+// Admin Pages
+import StudentListPage from '../admin/pages/StudentListPage';
+import LecturerListPage from '../admin/pages/LecturerListPage';
+import SubmissionListPage from '../admin/pages/SubmissionListPage';
 
 interface AppRoutesProps {
   user: User | null;
@@ -18,19 +25,9 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
-
-      {/* Root - redirect based on role */}
-      <Route 
-        path="/" 
-        element={
-          user ? (
-            <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        } 
-      />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* Admin Routes */}
       <Route
@@ -39,6 +36,36 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
           <ProtectedRoute user={user} loading={loading}>
             <RoleGuard user={user} allowedRoles={['ADMIN']}>
               <AdminDashboard me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/students"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['ADMIN']}>
+              <StudentListPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/lecturers"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['ADMIN']}>
+              <LecturerListPage me={user!} />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/submissions"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <RoleGuard user={user} allowedRoles={['ADMIN']}>
+              <SubmissionListPage me={user!} />
             </RoleGuard>
           </ProtectedRoute>
         }

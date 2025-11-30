@@ -39,6 +39,18 @@ public class Thesis {
   /** Major/Program (e.g., "Computer Science") */
   private String major;
 
+  /** Student name for public display */
+  private String studentName;
+
+  /** Supervisor name for public display */
+  private String supervisorName;
+
+  /** Program for public display */
+  private String program;
+
+  /** Submission year for public display */
+  private Integer submissionYear;
+
   /** When the thesis was published to public repository */
   private Instant publishedAt;
 

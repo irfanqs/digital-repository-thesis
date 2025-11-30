@@ -1,0 +1,5 @@
+-- Add fields for public display
+ALTER TABLE thesis ADD COLUMN IF NOT EXISTS student_name VARCHAR(255);
+ALTER TABLE thesis ADD COLUMN IF NOT EXISTS supervisor_name VARCHAR(255);
+ALTER TABLE thesis ADD COLUMN IF NOT EXISTS program VARCHAR(255);
+ALTER TABLE thesis ADD COLUMN IF NOT EXISTS submission_year INTEGER;

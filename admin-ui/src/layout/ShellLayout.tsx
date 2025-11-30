@@ -8,7 +8,7 @@ interface MeLike {
   role: string;
 }
 
-type NavKey = "dashboard" | "account" | "home" | "browse" | "help";
+type NavKey = "dashboard" | "students" | "lecturers" | "submissions" | "account" | "home" | "browse" | "help";
 
 interface ShellLayoutProps {
   me: MeLike;
@@ -36,6 +36,15 @@ function ShellLayout({
       case "dashboard":
         navigate(`/${rolePrefix}/dashboard`);
         break;
+      case "students":
+        navigate(`/${rolePrefix}/students`);
+        break;
+      case "lecturers":
+        navigate(`/${rolePrefix}/lecturers`);
+        break;
+      case "submissions":
+        navigate(`/${rolePrefix}/submissions`);
+        break;
       case "account":
         navigate(`/${rolePrefix}/account`);
         break;
@@ -43,7 +52,7 @@ function ShellLayout({
         navigate("/");
         break;
       case "browse":
-        navigate("/browse");
+        navigate("/");
         break;
       case "help":
         navigate("/help");
@@ -55,21 +64,16 @@ function ShellLayout({
     logout();
   };
 
-  return (
-    <div className="app-shell">
-      {/* LEFT SIDEBAR */}
-      <aside className="sidebar">
-        <div>
-          <div className="sidebar-header">SU ETD Repository</div>
-          <div className="sidebar-sub">Electronic Theses &amp; Dissertations</div>
-        </div>
-
-        <ul className="nav-list">
+  // Define menu items based on role
+  const getMenuItems = () => {
+    const role = me.role.toUpperCase();
+    
+    if (role === "ADMIN") {
+      return (
+        <>
           <li>
             <button
-              className={
-                "nav-item" + (activeNav === "dashboard" ? " active" : "")
-              }
+              className={"nav-item" + (activeNav === "dashboard" ? " active" : "")}
               onClick={() => handleNavClick("dashboard")}
             >
               <span>Dashboard</span>
@@ -77,20 +81,96 @@ function ShellLayout({
           </li>
           <li>
             <button
-              className={
-                "nav-item" + (activeNav === "account" ? " active" : "")
-              }
-              onClick={() => handleNavClick("account")}
+              className={"nav-item" + (activeNav === "students" ? " active" : "")}
+              onClick={() => handleNavClick("students")}
             >
-              <span>Account</span>
+              <span>View Student List</span>
             </button>
           </li>
           <li>
             <button
-              className={"nav-item" + (activeNav === "home" ? " active" : "")}
-              onClick={() => handleNavClick("home")}
+              className={"nav-item" + (activeNav === "lecturers" ? " active" : "")}
+              onClick={() => handleNavClick("lecturers")}
             >
-              <span>Home</span>
+              <span>View Lecturer List</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "submissions" ? " active" : "")}
+              onClick={() => handleNavClick("submissions")}
+            >
+              <span>View Student Submission</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "browse" ? " active" : "")}
+              onClick={() => handleNavClick("browse")}
+            >
+              <span>Browse Published Thesis</span>
+            </button>
+          </li>
+        </>
+      );
+    }
+    
+    if (role === "LECTURER") {
+      return (
+        <>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "dashboard" ? " active" : "")}
+              onClick={() => handleNavClick("dashboard")}
+            >
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "browse" ? " active" : "")}
+              onClick={() => handleNavClick("browse")}
+            >
+              <span>Browse Repository</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "help" ? " active" : "")}
+              onClick={() => handleNavClick("help")}
+            >
+              <span>Help</span>
+            </button>
+          </li>
+        </>
+      );
+    }
+    
+    if (role === "STUDENT") {
+      return (
+        <>
+          <li>
+            <button
+              className={"nav-item" + (activeNav === "dashboard" ? " active" : "")}
+              onClick={() => handleNavClick("dashboard")}
+            >
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className="nav-item"
+              onClick={() => navigate("/student/dashboard#supervisors")}
+            >
+              <span>Supervisors</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className="nav-item"
+              onClick={() => navigate("/student/dashboard#submission")}
+            >
+              <span>Thesis Submission</span>
             </button>
           </li>
           <li>
@@ -109,11 +189,42 @@ function ShellLayout({
               <span>Help</span>
             </button>
           </li>
+        </>
+      );
+    }
+    
+    // Default menu
+    return (
+      <>
+        <li>
+          <button
+            className={"nav-item" + (activeNav === "home" ? " active" : "")}
+            onClick={() => handleNavClick("home")}
+          >
+            <span>Home</span>
+          </button>
+        </li>
+      </>
+    );
+  };
+
+  return (
+    <div className="app-shell">
+      {/* LEFT SIDEBAR */}
+      <aside className="sidebar">
+        <div>
+          <div className="sidebar-header">SU ETD Repository</div>
+          <div className="sidebar-sub">Electronic Theses &amp; Dissertations</div>
+        </div>
+
+        <ul className="nav-list">
+          {getMenuItems()}
+          
           <li>
             <button
-              className="nav-item logout-btn"
+              className="nav-item"
               onClick={handleLogout}
-              style={{ marginTop: "auto", color: "#ff6b6b" }}
+              style={{ color: "#ff6b6b" }}
             >
               <span>Logout</span>
             </button>
